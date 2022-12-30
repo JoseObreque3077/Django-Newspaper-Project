@@ -1,0 +1,18 @@
+{% extends 'layout/base.html' %}
+
+{% block title %}Registro{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="row mt-3">
+            <div class="col">
+                <h1 class="text-center">Formulario de Registro</h1>
+            </div>
+        </div>
+        <div class="row justify-content-center mt-3 mb-3">
+            <div class="col-md-8 d-flex justify-content-center">
+                {% include 'registration/partials/form.html' with form=form texto='Registrarse' %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

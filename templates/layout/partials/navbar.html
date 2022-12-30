@@ -1,0 +1,30 @@
+<nav class="navbar navbar-expand-lg bg-primary">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="{% url 'home' %}">Newspaper App</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'home' %}">Inicio</a>
+                </li>
+                {% if user.is_authenticated %}
+                    <li class="nav-item">
+                        {# Se debe incluir la URL para crear artículos #}
+                        <a class="nav-link" href="">Crear Artículo</a>
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+        <div class="d-flex">
+            {% if user.is_authenticated %}
+                <span class="navbar-text mx-2">Bienvenido/a, {{ user.username }}</span>
+                <a href="{% url 'logout' %}" class="btn btn-warning mx-2">Cerrar Sesión</a>
+            {% else %}
+                <a href="{% url 'login' %}" class="btn btn-warning mx-2">Iniciar Sesión</a>
+                <a href="{% url 'signup' %}" class="btn btn-warning mx-2">Registrarse</a>
+            {% endif %}
+        </div>
+    </div>
+</nav>
