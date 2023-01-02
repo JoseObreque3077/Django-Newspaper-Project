@@ -7,9 +7,10 @@ from django.utils import timezone
 
 class LoginTestCase(TestCase):
     """
-    A Unit test case for the Django login and logout default behavior include
-    in the 'auth' package. It checks the login/logout logic, the error messages,
-    and the correct handling of user sessions.
+    A unit test case for the default login behavior in Django, which is
+    included in the 'auth' package. This test case checks the logic for logging
+    in, the error messages displayed, and the proper handling of user
+    sessions.
     """
     LOGIN_URL = reverse('login')
     HOMEPAGE_URL = reverse('home')
