@@ -6,7 +6,7 @@ from django.urls import reverse
 from accounts.forms import CustomUserCreationForm
 
 
-class SignupPageTests(TestCase):
+class SignupPageTestCase(TestCase):
     """
     Unit test case for the 'SignUpView' class that handles user signup in the
     'Accounts' application. It tests the signup form rendering, the submission
@@ -139,7 +139,9 @@ class SignupPageTests(TestCase):
         )
 
         # Checks if the new user has the correct info.
-        new_user = user_model.objects.get(pk=2)
+        new_user = user_model.objects.get(
+            username=form_data['username']
+        )
         new_user_partial_data = model_to_dict(
             instance=new_user,
             fields=['username', 'email', 'age']
