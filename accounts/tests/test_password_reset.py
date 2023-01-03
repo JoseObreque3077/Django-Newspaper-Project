@@ -1,10 +1,9 @@
-import re
 
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import PasswordResetForm, SetPasswordForm
 from django.core import mail
 from django.test import TestCase
-from django.urls import reverse, reverse_lazy
+from django.urls import reverse
 
 
 class PasswordResetTestCase(TestCase):
@@ -15,18 +14,16 @@ class PasswordResetTestCase(TestCase):
     PASSWORD_RESET_URL = reverse('password_reset')
     PASSWORD_RESET_DONE_URL = reverse('password_reset_done')
 
-    @classmethod
-    def setUpTestData(cls):
+    def setUp(self):
         """
         This method creates objects in a test database that are available to
-        all unit tests. It is called only once for this test case, and the
-        created objects are shared among all unit tests in this test case.
+        all unit tests. It is called before every unit test run.
         """
         # Custom user model used by this project
         user_model = get_user_model()
 
         # Test user
-        cls.user = user_model.objects.create(
+        self.user = user_model.objects.create(
             username='test_user',
             password='some_password',
             email='test@example.net',
@@ -34,8 +31,8 @@ class PasswordResetTestCase(TestCase):
         )
 
         # Use of non-encrypted password
-        cls.user.set_password('test_pass')
-        cls.user.save()
+        self.user.set_password('test_pass')
+        self.user.save()
 
     def test_password_reset_form_render_user_not_authenticated(self):
         """
@@ -180,7 +177,11 @@ class PasswordResetTestCase(TestCase):
             template_name='registration/password_reset_confirm.html'
         )
 
-    def test_final(self):
+    def test_password_reset_confirm_form_submit(self):
+        """
+        Checks that a user can send their new password using the 'password reset
+        confirm' form.
+        """
         # The password reset link UID and token are obtained from the email
         reset_form_data = {
             'email': 'test@example.net'
@@ -209,7 +210,7 @@ class PasswordResetTestCase(TestCase):
             follow=True
         )
 
-        # An HTTP Response for a POST Request to 'password reset confirms' URL
+        # HTTP Response for a POST Request to 'password reset confirms' URL
         # (to establish a new password).
         reset_confirm_url = reverse(
             viewname='password_reset_confirm',
@@ -246,10 +247,84 @@ class PasswordResetTestCase(TestCase):
         user_model = get_user_model()
         user = user_model.objects.get(username='test_user')
 
-        self.assertNotEqual(
-            first=user.password,
-            second='test_pass'  # old password
+        self.assertFalse(user.check_password('test_pass'))
+
+    def test_invalid_password_reset_confirm_form_submit(self):
+        """
+        Checks that a user cannot send their new password
+        using the 'password reset confirm' form with invalid data.
+        """
+        # The password reset link UID and token are obtained from the email
+        reset_form_data = {
+            'email': 'test@example.net'
+        }
+
+        response = self.client.post(
+            path=self.PASSWORD_RESET_URL,
+            data=reset_form_data
         )
 
+        uid = response.context[0]['uid']
+        token = response.context['token']
 
+        # HTTP Response: GET Request to password reset confirm URL
+        # (for token validation)
+        reset_confirm_url = reverse(
+            viewname='password_reset_confirm',
+            kwargs={
+                'uidb64': uid,
+                'token': token
+            }
+        )
 
+        self.client.get(
+            path=reset_confirm_url,
+            follow=True
+        )
+
+        # HTTP Response for a POST Request to 'password reset confirms' URL
+        # (to establish a new password).
+        reset_confirm_url = reverse(
+            viewname='password_reset_confirm',
+            kwargs={
+                'uidb64': uid,
+                'token': 'set-password'
+            }
+        )
+
+        response = self.client.post(
+            path=reset_confirm_url,
+            data={
+                'new_password1': 'new_pass123',
+                'new_password2': 'another_pass'
+            },
+            follow=True
+        )
+
+        # Checks that an HTTP 200 (OK) status code is returned.
+        self.assertEqual(
+            first=response.status_code,
+            second=200
+        )
+
+        # Checks that the view sends a form of the correct class in the context.
+        self.assertIsInstance(
+            obj=response.context['form'],
+            cls=SetPasswordForm
+        )
+
+        # Checks if the form contains errors
+        self.assertTrue(
+            expr=response.context['form'].errors
+        )
+
+        # Checks that the view renders the correct template.
+        self.assertTemplateUsed(
+            response=response,
+            template_name='registration/password_reset_confirm.html'
+        )
+
+        # Checks that the user password is the same
+        user_model = get_user_model()
+        user = user_model.objects.get(username='test_user')
+        self.assertTrue(user.check_password('test_pass'))
