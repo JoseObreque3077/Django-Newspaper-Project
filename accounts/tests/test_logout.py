@@ -22,16 +22,12 @@ class LogoutTestCase(TestCase):
         user_model = get_user_model()
 
         # Test user
-        cls.user = user_model.objects.create(
+        cls.user = user_model.objects.create_user(
             username='test_user',
-            password='some_password',
+            password='test_pass',
             email='test@example.net',
             age=18
         )
-
-        # Use of non-encrypted password
-        cls.user.set_password('test_pass')
-        cls.user.save()
 
     def test_logout_user_not_authenticated(self):
         """

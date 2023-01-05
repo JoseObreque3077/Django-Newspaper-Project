@@ -16,25 +16,21 @@ class SignupPageTestCase(TestCase):
     SIGNUP_URL = reverse('signup')
     LOGIN_URL = reverse('login')
 
-    @classmethod
-    def setUpTestData(cls):
+    def setUp(self):
         """
         This method creates objects in a test database that are available to
-        all unit tests. It is called only once for this test case, and the
-        created objects are shared among all unit tests in this test case.
+        all unit tests. It is called before every unit test run.
         """
         # Custom user model used by this project
         user_model = get_user_model()
 
         # Test user
-        cls.user = user_model.objects.create(
+        self.user = user_model.objects.create_user(
             username='test_user',
+            password='test_pass',
             email='test@example.net',
             age=18
         )
-        # Use of non-encrypted password
-        cls.user.set_password('test_pass')
-        cls.user.save()
 
     def test_signup_form_render_user_authenticated(self):
         """
@@ -109,6 +105,13 @@ class SignupPageTestCase(TestCase):
             second=403
         )
 
+        # Checks that there are no new users in the database.
+        user_model = get_user_model()
+        self.assertEqual(
+            first=user_model.objects.all().count(),
+            second=1
+        )
+
     def test_signup_form_submit_user_not_authenticated(self):
         """
         Checks that a non-authenticated user can submit the user signup form.
@@ -164,4 +167,10 @@ class SignupPageTestCase(TestCase):
         self.assertTemplateUsed(
             response=response,
             template_name='registration/login.html'
+        )
+
+        # Checks that exist a new user in the database
+        self.assertEqual(
+            first=user_model.objects.all().count(),
+            second=2
         )

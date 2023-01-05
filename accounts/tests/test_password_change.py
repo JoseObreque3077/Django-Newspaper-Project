@@ -13,27 +13,21 @@ class PasswordChangeTestCase(TestCase):
     PASSWORD_CHANGE_URL = reverse('password_change')
     PASSWORD_CHANGE_DONE_URL = reverse('password_change_done')
 
-    @classmethod
-    def setUpTestData(cls):
+    def setUp(self):
         """
         This method creates objects in a test database that are available to
-        all unit tests. It is called only once for this test case, and the
-        created objects are shared among all unit tests in this test case.
+        all unit tests. It is called before every unit test run.
         """
         # Custom user model used by this project
         user_model = get_user_model()
 
         # Test user
-        cls.user = user_model.objects.create(
+        self.user = user_model.objects.create_user(
             username='test_user',
-            password='some_password',
+            password='test_pass',
             email='test@example.net',
             age=18
         )
-
-        # Use of non-encrypted password
-        cls.user.set_password('test_pass')
-        cls.user.save()
 
     def test_password_change_form_render_user_not_authenticated(self):
         """
@@ -135,8 +129,8 @@ class PasswordChangeTestCase(TestCase):
 
         form_data = {
             'old_password': 'test_pass',
-            'new_password1': 'New_Pass_123',
-            'new_password2': 'New_Pass_123'
+            'new_password1': 'new_pass',
+            'new_password2': 'new_pass'
         }
 
         # HTTP Response
@@ -151,6 +145,11 @@ class PasswordChangeTestCase(TestCase):
             first=response.status_code,
             second=200
         )
+
+        # Checks that the user password has changed
+        user_model = get_user_model()
+        user = user_model.objects.get(username='test_user')
+        self.assertTrue(expr=user.check_password('new_pass'))
 
         # Checks that the view renders the correct template.
         self.assertTemplateUsed(
@@ -170,8 +169,8 @@ class PasswordChangeTestCase(TestCase):
 
         form_data = {
             'old_password': 'wrong_old_password',
-            'new_password1': 'New_Pass_123',
-            'new_password2': 'New_Pass_123'
+            'new_password1': 'new_pass',
+            'new_password2': 'new_pass'
         }
 
         # HTTP Response
@@ -203,3 +202,8 @@ class PasswordChangeTestCase(TestCase):
             response=response,
             template_name='registration/password_change_form.html'
         )
+
+        # Checks that the user password is the same
+        user_model = get_user_model()
+        user = user_model.objects.get(username='test_user')
+        self.assertTrue(expr=user.check_password('test_pass'))

@@ -26,26 +26,19 @@ class LoginTestCase(TestCase):
         user_model = get_user_model()
 
         # Test user
-        cls.user = user_model.objects.create(
+        cls.user = user_model.objects.create_user(
             username='test_user',
-            password='some_password',
+            password='test_pass',
             email='test@example.net',
             age=18
         )
 
-        cls.user_2 = user_model.objects.create(
+        cls.user_2 = user_model.objects.create_user(
             username='test_user_2',
-            password='some_password',
+            password='test_pass',
             email='test_2@example.net',
             age=18
         )
-
-        # Use of non-encrypted password
-        cls.user.set_password('test_pass')
-        cls.user_2.set_password('test_pass')
-
-        cls.user.save()
-        cls.user_2.save()
 
     def test_login_form_render_user_not_authenticated(self):
         """
