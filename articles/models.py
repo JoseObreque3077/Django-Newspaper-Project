@@ -5,7 +5,7 @@ from django.urls import reverse
 
 class Article(models.Model):
     """
-    This class represents an article object.
+    A model that represents a newspaper article.
 
     Attributes:
         title: The title of the article.
@@ -47,3 +47,35 @@ class Article(models.Model):
             }
         )
         return article_detail_url
+
+
+class Comment(models.Model):
+    """
+    A model that represents a comment made on a newspaper article.
+    """
+    comment = models.CharField(
+        max_length=150,
+        verbose_name='Comentario'
+    )
+    article = models.ForeignKey(
+        to=Article,
+        on_delete=models.CASCADE
+    )
+    author = models.ForeignKey(
+        to=settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE
+    )
+
+    def __str__(self):
+        """
+        It returns the string representation of a 'Comment' object.
+        :return: The comment content.
+        """
+        return self.comment
+
+    def get_absolute_url(self):
+        """
+        It returns the absolute URL of the Article list.
+        :return: The absolute URL for the article list.
+        """
+        return reverse(viewname='article_list')
