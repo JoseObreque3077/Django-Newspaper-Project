@@ -17,7 +17,7 @@ class Article(models.Model):
         max_length=255,
         verbose_name='Título'
     )
-    body = models.CharField(
+    body = models.TextField(
         verbose_name='Texto'
     )
     date = models.DateTimeField(
