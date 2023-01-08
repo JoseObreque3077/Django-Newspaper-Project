@@ -14,8 +14,7 @@
                         <a class="nav-link" href="{% url 'article_list' %}">Ver Artículos</a>
                     </li>
                     <li class="nav-item">
-                        {# Se debe incluir la URL para crear artículos #}
-                        <a class="nav-link" href="">Crear Artículo</a>
+                        <a class="nav-link" href="{% url 'article_new' %}">Crear Artículo</a>
                     </li>
                 {% endif %}
             </ul>

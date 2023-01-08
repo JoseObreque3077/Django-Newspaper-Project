@@ -3,6 +3,7 @@ from django.test import TestCase
 from django.urls import reverse
 
 from articles.models import Article
+from articles.tests.utils import TestUtils
 
 
 class ArticleListTestCase(TestCase):
@@ -14,8 +15,12 @@ class ArticleListTestCase(TestCase):
     expected HTTP response codes, rendering the correct templates, and
     displaying the list of available articles in the database.
     """
+    # URLs
     LOGIN_URL = reverse('login')
     ARTICLE_LIST_URL = reverse('article_list')
+
+    # Utility methods
+    utils = TestUtils()
 
     @classmethod
     def setUpTestData(cls):
@@ -75,18 +80,9 @@ class ArticleListTestCase(TestCase):
         )
 
         # Checks that there is a redirect to the login page
-        redirect_url = f'{self.LOGIN_URL}?next={self.ARTICLE_LIST_URL}'
-        self.assertRedirects(
+        self.utils.check_login_redirect(
             response=response,
-            expected_url=redirect_url,
-            status_code=302,
-            target_status_code=200
-        )
-
-        # Checks that the view renders the correct template.
-        self.assertTemplateUsed(
-            response=response,
-            template_name='registration/login.html'
+            target_url=self.ARTICLE_LIST_URL
         )
 
     def test_article_list_render_user_authenticated(self):

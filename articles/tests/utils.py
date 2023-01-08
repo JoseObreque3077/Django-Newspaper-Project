@@ -17,8 +17,7 @@ class TestUtils(TestCase):
         specified target URL.
 
         :param response: The HTTP response.
-        :param target_url:
-        :return:
+        :param target_url: The target URL to redirect to after successful login.
         """
         redirect_url = f'{self.LOGIN_URL}?next={target_url}'
         self.assertRedirects(

@@ -1,7 +1,7 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse
 from django.views import View
-from django.views.generic import ListView, DetailView, FormView
+from django.views.generic import ListView, DetailView, FormView, CreateView
 from django.views.generic.detail import SingleObjectMixin
 
 from articles.forms import CommentForm
@@ -156,3 +156,37 @@ class ArticleDetailView(LoginRequiredMixin, View):
         """
         view = ArticleDetailPost.as_view()
         return view(request, *args, **kwargs)
+
+
+class ArticleCreateView(LoginRequiredMixin, CreateView):
+    """
+    A class-based view for creating a new article.
+
+    This view extends the Django 'LoginRequiredMixin' mixin to ensure that
+    only authenticated users can access it. It also uses the built-in Django
+    generic view 'CreateView' to handle the creation of a new article instance.
+
+    Attributes:
+        model: The model to use for the view.
+        fields: The model fields to display in the form for creating a new
+            article instance.
+        template_name: The name of the template to use for the view.
+    """
+    model = Article
+    fields = ('title', 'body')
+    template_name = 'articles/article_new.html'
+
+    def form_valid(self, form):
+        """
+        A method called when the form submission is valid.
+
+        This method adds the authenticated user as the article's author
+        before saving the form to the database.
+
+        It then calls the parent's implementation of the method.
+
+        :param form: The form being submitted.
+        :return: The HTTP response.
+        """
+        form.instance.author = self.request.user
+        return super().form_valid(form)
