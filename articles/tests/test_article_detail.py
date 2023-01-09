@@ -52,6 +52,7 @@ class ArticleDetailTestCase(TestCase):
 
         # Test article
         Article.objects.create(
+            pk=1,
             title='Test Article',
             body='Test Body',
             author=cls.user
