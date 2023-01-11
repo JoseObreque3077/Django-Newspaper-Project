@@ -1,6 +1,7 @@
 from django.urls import path
 
-from articles.views import ArticleListView, ArticleDetailView, ArticleCreateView
+from articles.views import ArticleListView, ArticleDetailView, \
+    ArticleCreateView, ArticleUpdateView
 
 urlpatterns = [
     path(
@@ -17,5 +18,10 @@ urlpatterns = [
         route='new/',
         view=ArticleCreateView.as_view(),
         name='article_new'
+    ),
+    path(
+        route='edit/<int:pk>',
+        view=ArticleUpdateView.as_view(),
+        name='article_edit'
     )
 ]

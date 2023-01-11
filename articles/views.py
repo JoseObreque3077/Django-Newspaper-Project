@@ -1,7 +1,8 @@
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.urls import reverse
 from django.views import View
-from django.views.generic import ListView, DetailView, FormView, CreateView
+from django.views.generic import ListView, DetailView, FormView, CreateView, \
+    UpdateView
 from django.views.generic.detail import SingleObjectMixin
 
 from articles.forms import CommentForm
@@ -190,3 +191,37 @@ class ArticleCreateView(LoginRequiredMixin, CreateView):
         """
         form.instance.author = self.request.user
         return super().form_valid(form)
+
+
+class ArticleUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    """
+    A class-based view for updating an article.
+
+    This view extends the Django's 'LoginRequiredMixin' mixin to ensure
+    that only authenticated users can access it and the
+    'UserPassesTestMixin' mixin to ensure that only the author of an
+    article can edit its info. It also uses the built-in Django generic
+    view 'UpdateView' to handle the update of an existing article.
+
+    Attributes:
+        model: The model to use for the view.
+        fields: The model fields to display in the form for updating an article.
+        template_name: The name of the template to use for the view.
+    """
+    model = Article
+    fields = ('title', 'body')
+    template_name = 'articles/article_edit.html'
+
+    def test_func(self):
+        """
+        A test method to check if the current user is the article author.
+
+        The method checks if the current authenticated user is the article
+        author by comparing it with the 'obj.author' (obj is the instance of
+        the article to be updated).
+
+        :return: True, if the current authenticated user is the article author,
+            False otherwise.
+        """
+        obj = self.get_object()
+        return obj.author == self.request.user
