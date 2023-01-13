@@ -1,8 +1,8 @@
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 from django.views import View
 from django.views.generic import ListView, DetailView, FormView, CreateView, \
-    UpdateView
+    UpdateView, DeleteView
 from django.views.generic.detail import SingleObjectMixin
 
 from articles.forms import CommentForm
@@ -130,6 +130,7 @@ class ArticleDetailView(LoginRequiredMixin, View):
     mixin) and uses the 'ArticleDetailGet' and 'ArticleDetailPost' views
     to handle the GET and POST requests, respectively.
     """
+
     def get(self, request, *args, **kwargs):
         """
         Handles GET requests for the view.
@@ -211,6 +212,40 @@ class ArticleUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Article
     fields = ('title', 'body')
     template_name = 'articles/article_edit.html'
+
+    def test_func(self):
+        """
+        A test method to check if the current user is the article author.
+
+        The method checks if the current authenticated user is the article
+        author by comparing it with the 'obj.author' (obj is the instance of
+        the article to be updated).
+
+        :return: True, if the current authenticated user is the article author,
+            False otherwise.
+        """
+        obj = self.get_object()
+        return obj.author == self.request.user
+
+
+class ArticleDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    """
+    A class-based view for deleting an article.
+
+    This view extends the Django's 'LoginRequiredMixin' mixin to ensure that
+    only authenticated users can access it and the 'UserPassesTestMixin'
+    mixin to ensure that only the author of an article can delete it.
+    It also uses the built-in Django generic view 'DeleteView' to handle
+    the article deletion process.
+
+    Attributes:
+        - model: The model to use for the view.
+        - template_name: The name of the template to use for the view.
+        - success_url: The success URL of an article deletion.
+    """
+    model = Article
+    template_name = 'articles/article_delete.html'
+    success_url = reverse_lazy('article_list')
 
     def test_func(self):
         """
