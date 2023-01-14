@@ -79,9 +79,11 @@
         <div class="row mt-2 mb-3 justify-content-center">
             <div class="col-md-10">
                 <div class="d-grid gap-4 d-md-block justify-content-center" role="group">
-                    <a href="#" class="btn btn-warning">Editar</a>
-                    <a href="#" class="btn btn-danger">Eliminar</a>
-                    <a href="{% url 'article_list' %}" class="btn btn-danger">Todos los Artículos</a>
+                    {% if article.author == user%}
+                        <a href="{% url 'article_edit' pk=article.pk %}" class="btn btn-warning">Editar</a>
+                        <a href="{% url 'article_delete' pk=article.pk %}" class="btn btn-danger">Eliminar</a>
+                    {% endif %}
+                    <a href="{% url 'article_list' %}" class="btn btn-success">Todos los Artículos</a>
                 </div>
             </div>
         </div>

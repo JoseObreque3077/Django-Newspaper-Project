@@ -21,8 +21,10 @@
                         <div class="card-footer d-flex justify-content-center">
                             <div class="d-grid gap-4 d-md-block justify-content-center" role="group" aria-label="Basic mixed styles example">
                                 <a href="{% url 'article_detail' pk=article.pk %}" class="btn btn-success">Detalles</a>
-                                <a href="{% url 'article_edit' pk=article.pk %}" class="btn btn-warning">Editar</a>
-                                <a href="{% url 'article_delete' pk=article.pk %}" class="btn btn-danger">Eliminar</a>
+                                {% if article.author == user %}
+                                    <a href="{% url 'article_edit' pk=article.pk %}" class="btn btn-warning">Editar</a>
+                                    <a href="{% url 'article_delete' pk=article.pk %}" class="btn btn-danger">Eliminar</a>
+                                {% endif %}
                             </div>
                         </div>
                     </div>
