@@ -14,12 +14,9 @@ class Article(models.Model):
         author: The user who is the author of the article.
     """
     title = models.CharField(
-        max_length=255,
-        verbose_name='Título'
+        max_length=255
     )
-    body = models.TextField(
-        verbose_name='Texto'
-    )
+    body = models.TextField()
     date = models.DateTimeField(
         auto_now_add=True
     )
@@ -54,8 +51,7 @@ class Comment(models.Model):
     A model that represents a comment made on a newspaper article.
     """
     comment = models.CharField(
-        max_length=150,
-        verbose_name='Comentario'
+        max_length=150
     )
     article = models.ForeignKey(
         to=Article,

@@ -13,6 +13,5 @@ class CustomUser(AbstractUser):
     """
     age = models.PositiveIntegerField(
         null=True,
-        blank=True,
-        verbose_name='Edad'
+        blank=True
     )
